@@ -1,0 +1,58 @@
+syntax = "proto3";
+package dps;
+
+option java_multiple_files = true;
+
+option java_package = "dps.productionline.grpc";
+
+enum OperationalStateProto {
+  FULLY_OPERATIONAL = 0;
+  WAITING_FOR_CALIBRATION = 1; 
+  UNDER_CALIBRATION = 2;   
+}
+
+message TelemetryProtoMessage {
+  int32 lineId = 1;
+  int64 timestamp = 2;
+  OperationalStateProto state = 3;
+  repeated double averages = 4; 
+}
+
+message StateUpdateProtoMessage {
+  int32 lineId = 1;
+  OperationalStateProto state = 2;
+  int64 timestamp = 3;
+  double criticality = 4;
+  bool hasCriticSituation = 5;
+
+}
+
+message CalibrationRequest{
+  int32  lineId      = 1;
+  double criticality = 2;
+}
+
+message CalibrationReply{
+  int32 lineId = 1;
+}
+
+message Announcement {
+  int32  lineId  = 1;
+  string address = 2;
+  int32  port    = 3;
+}
+
+message LeaveNotification{
+  int32 lineId = 1;
+}
+
+message Ack {
+
+}
+
+service CoordinationService {
+  rpc RequestCalibration(CalibrationRequest) returns (Ack);
+  rpc SendReply(CalibrationReply) returns (Ack);
+  rpc Announce(Announcement) returns (Ack);
+  rpc LeavingNotification(LeaveNotification) returns (Ack);
+}
